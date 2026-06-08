@@ -15,6 +15,7 @@ let ANS  = load(LS_ANS,{});
 let CHK  = load(LS_CHK,{});
 let SCR  = load(LS_SCR,{});
 let MISC = load(LS_MISC,{});
+MISC.roleWho = MISC.roleWho || {};   // { roleId: 受访人姓名 } —— 一次走访分别访不同岗位的人
 
 let saveTimer=null;
 function persist(){
@@ -63,6 +64,10 @@ function renderQuestions(){
       <span class="rh-ic"><svg class="ic"><use href="#${r.icon}"/></svg></span>
       <div><div class="rh-k">${r.code} · Interview${r.tier?` <span class="badge">${esc(r.tier)}</span>`:''}</div>
         <h2>${esc(r.name)}</h2><div class="rh-s">${esc(r.sub)}</div></div>
+    </div>
+    <div class="rolewho c-${r.color}">
+      <svg class="ic"><use href="#i-user"/></svg>
+      <input data-rwho placeholder="本角色受访人，如 张工 / 李经理" value="${esc(MISC.roleWho[curRole]||'')}">
     </div>`;
   qs.forEach(q=>{
     const a=ANS[q.id]||{};
@@ -81,6 +86,10 @@ function renderQuestions(){
     </div>`;
   });
   askBody.innerHTML=html;
+
+  // wire 受访人（本角色）
+  const rwho=askBody.querySelector('[data-rwho]');
+  if(rwho) rwho.addEventListener('input',()=>{ MISC.roleWho[curRole]=rwho.value; persist(); });
 
   // wire
   $$('#askBody .qcard').forEach(card=>{
@@ -296,7 +305,7 @@ function buildMD(){
   const date=MISC.date||new Date().toISOString().slice(0,10);
   const now=new Date().toLocaleString('zh-CN');
   let md=`# 傲虎事业部 · 走访记录\n\n`;
-  md+=`> 受访：${MISC.who?MISC.who:'（未填）'}　|　走访日期：${date}　|　导出：${now}\n\n`;
+  md+=`> 受访单位：${MISC.who?MISC.who:'（未填）'}　|　走访日期：${date}　|　导出：${now}\n\n`;
   md+=`---\n\n## 一、分角色访谈\n\n`;
   let anyAsk=false;
   D.roles.forEach(r=>{
@@ -304,7 +313,8 @@ function buildMD(){
     const recorded=qs.filter(q=>{const a=ANS[q.id];return a&&((a.note&&a.note.trim())||a.star||a.secs);});
     if(!recorded.length)return;
     anyAsk=true;
-    md+=`### ${r.code} ${r.name}（${r.sub}）\n\n`;
+    const rw=(MISC.roleWho[r.id]||'').trim();
+    md+=`### ${r.code} ${r.name}（${r.sub}）${rw?`　受访人：${rw}`:''}\n\n`;
     recorded.forEach(q=>{
       const a=ANS[q.id]||{};
       md+=`**Q${q.n}${a.star?' ⭐':''}** ${q.t}\n`;
@@ -370,7 +380,7 @@ $('#mExport').addEventListener('click',doExport);
 $('#mCopy').addEventListener('click',doCopy);
 $('#mReset').addEventListener('click',()=>{
   if(!confirm('清空本次走访的全部记录？此操作不可撤销（导出的 .md 文件不受影响）。'))return;
-  ANS={};CHK={};SCR={};const keepDate=MISC.date;MISC={date:keepDate};
+  ANS={};CHK={};SCR={};const keepDate=MISC.date;MISC={date:keepDate,roleWho:{}};
   [LS_ANS,LS_CHK,LS_SCR,LS_MISC].forEach(k=>localStorage.removeItem(k));
   persist();
   mWho.value='';overall.value='';

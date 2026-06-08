@@ -91,6 +91,10 @@
   .rolehead .rh-k .badge{color:var(--c);background:var(--cs);border-radius:20px;padding:1px 8px;letter-spacing:.04em}
   .rolehead h2{font-family:"Noto Serif SC",serif;font-size:21px;font-weight:700;line-height:1.2;margin:3px 0 2px}
   .rolehead .rh-s{font-size:12.5px;color:var(--muted)}
+  .rolewho{display:flex;align-items:center;gap:7px;margin:-6px 2px 16px;padding:8px 11px;border:1px solid var(--c);background:var(--cs);border-radius:10px}
+  .rolewho .ic{font-size:15px;color:var(--c);flex:none}
+  .rolewho input{flex:1;min-width:0;border:none;background:transparent;font-size:13px;color:var(--ink);outline:none;font-weight:500}
+  .rolewho input::placeholder{color:var(--faint);font-weight:400}
 
   /* ---- question card ---- */
   .qcard{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:13px;padding:14px 15px;box-shadow:var(--shadow-sm);margin-bottom:12px;transition:.18s}
@@ -265,8 +269,8 @@
 
   <!-- session meta -->
   <div class="meta">
-    <span class="mlab">受访</span>
-    <input id="mWho" type="text" placeholder="姓名 / 角色，如 张工 · 业务员">
+    <span class="mlab">单位</span>
+    <input id="mWho" type="text" placeholder="受访单位 / 部门，如 傲虎事业部">
     <span class="mdiv"></span>
     <input id="mDate" class="mdate" type="date">
   </div>
